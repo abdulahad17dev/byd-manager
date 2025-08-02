@@ -1,0 +1,62 @@
+<resources>
+    <!-- Основные строки -->
+    <string name="app_name">ADB Client Demo</string>
+    <string name="advanced_functions">Расширенные функции</string>
+
+    <!-- Кнопки -->
+    <string name="btn_check_adb">Проверить\nADB</string>
+    <string name="btn_device_info">Информация\nоб устройстве</string>
+    <string name="btn_run_commands">Выполнить\nкоманды</string>
+    <string name="btn_long_operation">Длительная\nоперация</string>
+    <string name="btn_clear_log">Очистить лог</string>
+
+    <!-- Заголовки -->
+    <string name="title_main">ADB Client Demo</string>
+    <string name="title_output">Вывод команд:</string>
+    <string name="description">Демонстрация работы с ADB клиентом для Android устройств</string>
+
+    <!-- Сообщения -->
+    <string name="msg_adb_available">ADB демон доступен</string>
+    <string name="msg_adb_unavailable">ADB демон недоступен</string>
+    <string name="msg_operation_started">Операция запущена</string>
+    <string name="msg_operation_completed">Операция завершена</string>
+    <string name="msg_operation_failed">Операция не удалась</string>
+    <string name="msg_connecting">Подключение к ADB...</string>
+    <string name="msg_connected">Подключено к ADB</string>
+    <string name="msg_disconnected">Отключено от ADB</string>
+
+    <!-- Состояния -->
+    <string name="status_ready">Готов</string>
+    <string name="status_working">Выполняется...</string>
+    <string name="status_connected">Подключен</string>
+    <string name="status_disconnected">Отключен</string>
+    <string name="status_error">Ошибка</string>
+
+    <!-- Ошибки -->
+    <string name="error_adb_connection">Ошибка подключения к ADB</string>
+    <string name="error_command_execution">Ошибка выполнения команды</string>
+    <string name="error_device_info">Ошибка получения информации об устройстве</string>
+    <string name="error_permission_denied">Доступ запрещен</string>
+    <string name="error_timeout">Превышено время ожидания</string>
+    <string name="error_network">Ошибка сети</string>
+
+    <!-- Информационные сообщения -->
+    <string name="info_checking_adb">Проверяется доступность ADB...</string>
+    <string name="info_getting_device_info">Получение информации об устройстве...</string>
+    <string name="info_executing_commands">Выполнение команд...</string>
+    <string name="info_long_operation">Выполнение длительной операции...</string>
+
+    <!-- Подсказки -->
+    <string name="hint_enable_usb_debugging">Включите отладку по USB в настройках разработчика</string>
+    <string name="hint_authorize_device">Авторизуйте устройство для отладки</string>
+    <string name="hint_start_adb_server">Запустите ADB server командой \'adb start-server\'</string>
+    <string name="hint_check_connection">Проверьте подключение устройства</string>
+
+    <!-- Лог сообщения -->
+    <string name="log_app_started">ADB Demo приложение запущено</string>
+    <string name="log_cleared">Лог очищен</string>
+    <string name="log_adb_check">Проверяем доступность ADB...</string>
+    <string name="log_device_info">Получаем информацию об устройстве...</string>
+    <string name="log_commands">Выполняем команды...</string>
+    <string name="log_long_operation">Запускаем длительную операцию...</string>
+</resources>
