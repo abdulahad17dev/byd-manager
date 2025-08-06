@@ -59,6 +59,16 @@
 <!--                <action android:name="android.intent.action.BOOT_COMPLETED" />-->
 <!--            </intent-filter>-->
 <!--        </receiver>-->
+        <!-- Service для IPC между процессами -->
+        <service
+            android:name=".VehicleBinderService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.byd.vehiclecontrol.VEHICLE_CONTROL" />
+            </intent-filter>
+        </service>
+        
     </application>
 
 </manifest>

@@ -10,7 +10,7 @@ public class WindowTestAPI {
 
     // Конкретные параметры для тестирования
     private static final int WINDOW_SYSTEM = 1001;
-    private static final int WINDOW_EVENT = 1125122104;
+    private static final int WINDOW_EVENT = 1125122107;
     private static final int WINDOW_OPEN = 1;
     private static final int WINDOW_CLOSE = 0;
 

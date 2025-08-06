@@ -335,6 +335,22 @@ public class AdbShellHelper {
 
         new Thread(() -> {
             try {
+                // Проверяем, что соединение все еще активно
+                if (connection == null) {
+                    Log.e(TAG, "Соединение с ADB потеряно, переподключаемся...");
+                    
+                    // Пытаемся переподключиться
+                    connect(context);
+                    Thread.sleep(1000); // Даем время на подключение
+                    
+                    if (!isConnected()) {
+                        runOnUiThread(() -> {
+                            Toast.makeText(context, "Не удалось подключиться к ADB", Toast.LENGTH_SHORT).show();
+                        });
+                        return;
+                    }
+                }
+                
                 // Получаем путь к APK файлу
                 String apkPath = context.getApplicationInfo().sourceDir;
                 Log.d(TAG, "APK Path: " + apkPath);
@@ -342,11 +358,11 @@ public class AdbShellHelper {
                 // Получаем cache directory для рабочей директории
                 String cacheDir = "/data/data/" + context.getPackageName() + "/cache";
 
-                // Формируем команду app_process по аналогии с оригинальным проектом
+                // Формируем команду app_process с правильными параметрами
+                // Используем CLASSPATH для надежной загрузки классов
                 String command = String.format(
-                        "nohup app_process -Djava.class.path=%s %s --nice-name=VoiceAssistantProcess %s >/dev/null 2>&1 &",
+                        "CLASSPATH=%s app_process /system/bin %s &",
                         apkPath,
-                        cacheDir,
                         APP_PROCESS_CLASS
                 );
 
@@ -397,8 +413,16 @@ public class AdbShellHelper {
 
         new Thread(() -> {
             try {
+                // Проверяем активность соединения
+                if (connection == null) {
+                    Log.w(TAG, "Соединение неактивно при проверке статуса процесса");
+                    isAppProcessRunning = false;
+                    return;
+                }
+                
                 // Ищем наш процесс в списке запущенных процессов
-                AdbStream stream = connection.open("shell:ps -A | grep VoiceAssistantProcess");
+                // app_process запускается с CLASSPATH нашего APK, ищем по пути APK
+                AdbStream stream = connection.open("shell:ps -A | grep app_process");
 
                 StringBuilder result = new StringBuilder();
                 long startTime = System.currentTimeMillis();
@@ -443,8 +467,8 @@ public class AdbShellHelper {
 
         new Thread(() -> {
             try {
-                // Убиваем процесс по имени
-                AdbStream stream = connection.open("shell:kill -9 $(ps -A | grep VoiceAssistantProcess | awk 'NR==1{print $2}')");
+                // Убиваем процесс по имени класса
+                AdbStream stream = connection.open("shell:kill -9 $(ps -A | grep " + APP_PROCESS_CLASS + " | awk 'NR==1{print $2}')");
 
                 Thread.sleep(500);
                 stream.close();

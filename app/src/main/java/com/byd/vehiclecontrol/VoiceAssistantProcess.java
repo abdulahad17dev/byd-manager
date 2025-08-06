@@ -4,8 +4,11 @@ import android.app.ActivityThread;
 import android.app.Application;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+import com.byd.vehiclecontrol.shell.CommunicationBinder;
+import com.byd.vehiclecontrol.shell.CommunicationProcess;
 
 /**
  * Главный класс процесса, который запускается через app_process
@@ -14,25 +17,28 @@ import android.util.Log;
 public class VoiceAssistantProcess {
     private static final String TAG = "VoiceAssistantProcess";
     private static final String ACTION_COMMUNICATION_PROCESS_STARTED = "ACTION_voice_assistant_process_started";
+    private CommunicationBinder communicationBinder;
+    private CommunicationProcess communicationProcess;
 
     /**
      * Точка входа для app_process
      * Эквивалент main функции из CommunicationProcessKt
      */
     public static void main(String[] args) {
-        Log.d(TAG, "=== VoiceAssistantProcess started ===");
-        Log.d(TAG, "Process ID: " + android.os.Process.myPid());
-        Log.d(TAG, "User ID: " + android.os.Process.myUid());
-        Log.d(TAG, "Arguments: " + java.util.Arrays.toString(args));
+        // Используем System.out для отладки, так как Log может не работать
+        System.out.println("=== VoiceAssistantProcess started ===");
+        System.out.println("Process ID: " + android.os.Process.myPid());
+        System.out.println("User ID: " + android.os.Process.myUid());
+        System.out.println("Arguments: " + java.util.Arrays.toString(args));
 
         try {
             // Создаем экземпляр процесса и запускаем его
             VoiceAssistantProcess process = new VoiceAssistantProcess();
             process.run(args);
 
-        } catch (Exception e) {
-            Log.e(TAG, "Критическая ошибка в VoiceAssistantProcess: " +
-                    android.util.Log.getStackTraceString(e));
+        } catch (Throwable e) {
+            System.err.println("Критическая ошибка в VoiceAssistantProcess: " + e.getMessage());
+            e.printStackTrace();
 
             // Принудительно завершаем процесс при ошибке
             android.os.Process.killProcess(android.os.Process.myPid());
@@ -45,28 +51,41 @@ public class VoiceAssistantProcess {
      */
     public void run(String[] args) {
         try {
-            Log.d(TAG, "Инициализация VoiceAssistantProcess...");
+            System.out.println("Инициализация VoiceAssistantProcess...");
 
+            // Сначала попробуем самый простой тест
+            System.out.println("Шаг 1: Базовая проверка...");
+            Thread.sleep(100);
+            
+            System.out.println("Шаг 2: Инициализация Android runtime...");
             // Подготавливаем Android runtime среду
             initAndroidRuntime();
+            
+            System.out.println("Шаг 3: Создание Binder...");
+            // Создаем и регистрируем Binder для IPC
+            setupBinder();
 
+            System.out.println("Шаг 4: Выполнение основной логики...");
             // Выполняем основную логику
             execute(args);
 
+            System.out.println("Шаг 5: Отправка broadcast...");
             // Отправляем broadcast что процесс запущен
             sendBroadcast();
 
+            System.out.println("Шаг 6: Тестирование системных сервисов...");
             // Тестируем доступ к системным сервисам
             testSystemServices();
 
-            Log.d(TAG, "✅ Инициализация завершена. Процесс готов к работе!");
+            System.out.println("✅ Инициализация завершена. Процесс готов к работе!");
 
             // Запускаем event loop для постоянной работы
-            Log.d(TAG, "Запуск event loop...");
+            System.out.println("Запуск event loop...");
             Looper.loop();
 
-        } catch (Exception e) {
-            Log.e(TAG, "Ошибка в run(): " + android.util.Log.getStackTraceString(e));
+        } catch (Throwable e) {
+            System.err.println("Ошибка в run(): " + e.getMessage());
+            e.printStackTrace();
             exitProcess();
         }
     }
@@ -99,6 +118,97 @@ public class VoiceAssistantProcess {
         }
 
         Log.d(TAG, "Android runtime инициализирован успешно");
+    }
+    
+    /**
+     * Создает и регистрирует CommunicationBinder для межпроцессного взаимодействия
+     */
+    private void setupBinder() {
+        try {
+            System.out.println("setupBinder: Начинаем создание CommunicationBinder...");
+            
+            Application app = ActivityThread.currentApplication();
+            System.out.println("setupBinder: Application = " + app);
+            
+            if (app != null) {
+                System.out.println("setupBinder: Создаем CommunicationProcess...");
+                // Создаем наследника CommunicationProcess с защищенным конструктором
+                communicationProcess = new CommunicationProcess("VoiceAssistantProcess") {
+                    @Override
+                    public Application getApplication() {
+                        return ActivityThread.currentApplication();
+                    }
+                    
+                    @Override
+                    public void execute(String[] args) {
+                        // Не используется в этом контексте
+                    }
+                };
+                
+                System.out.println("setupBinder: CommunicationProcess создан");
+                
+                // Устанавливаем application field через рефлексию
+                try {
+                    java.lang.reflect.Field appField = CommunicationProcess.class
+                            .getSuperclass().getDeclaredField("application");
+                    appField.setAccessible(true);
+                    appField.set(communicationProcess, app);
+                    System.out.println("setupBinder: Application field установлен");
+                } catch (Exception e) {
+                    System.err.println("setupBinder: Не удалось установить application field: " + e.getMessage());
+                }
+                
+                // Создаем Binder
+                System.out.println("setupBinder: Создаем CommunicationBinder...");
+                communicationBinder = new CommunicationBinder(communicationProcess);
+                System.out.println("setupBinder: CommunicationBinder создан = " + communicationBinder);
+                
+                // Регистрируем Binder глобально через VehicleApplication
+                System.out.println("setupBinder: Регистрируем Binder глобально...");
+                registerBinderGlobally(communicationBinder);
+                
+                System.out.println("✅ setupBinder: Binder успешно зарегистрирован для IPC");
+            } else {
+                System.err.println("❌ setupBinder: Application is null, не можем создать Binder");
+            }
+            
+        } catch (Throwable e) {
+            System.err.println("setupBinder: КРИТИЧЕСКАЯ ОШИБКА: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Регистрирует Binder глобально для доступа из основного процесса
+     */
+    private void registerBinderGlobally(IBinder binder) {
+        try {
+            // Сохраняем в глобальный статический экземпляр
+            CommunicationBinder.setGlobalInstance((CommunicationBinder) binder);
+            System.out.println("✅ Binder сохранен в CommunicationBinder.globalInstance");
+            
+            // Пытаемся установить в VehicleBinderService напрямую
+            Class<?> serviceClass = Class.forName("com.byd.vehiclecontrol.VehicleBinderService");
+            java.lang.reflect.Field shellBinderField = serviceClass.getDeclaredField("sShellBinder");
+            shellBinderField.setAccessible(true);
+            shellBinderField.set(null, binder);
+            System.out.println("✅ Binder установлен в VehicleBinderService.sShellBinder");
+            
+            // Дополнительно пытаемся зарегистрировать как системный сервис (может не работать без прав)
+            try {
+                Class<?> serviceManagerClass = Class.forName("android.os.ServiceManager");
+                java.lang.reflect.Method addServiceMethod = serviceManagerClass.getDeclaredMethod(
+                        "addService", String.class, IBinder.class);
+                addServiceMethod.setAccessible(true);
+                addServiceMethod.invoke(null, "byd.vehicle.control", binder);
+                System.out.println("✅ Binder также зарегистрирован как системный сервис");
+            } catch (Exception sysErr) {
+                System.out.println("⚠️ Не удалось зарегистрировать как системный сервис (требуются права): " + sysErr.getMessage());
+            }
+        } catch (Exception e) {
+            System.err.println("Ошибка регистрации Binder: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**

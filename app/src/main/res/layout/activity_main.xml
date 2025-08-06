@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp"
     android:background="#000000">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
 
     <!-- Заголовок -->
     <TextView
@@ -165,6 +169,147 @@
         android:background="#ddd"
         android:layout_margin="8dp" />
 
+    <!-- Заголовок для управления автомобилем -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🚗 Управление автомобилем"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#333"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Статус связи с автомобилем -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/button_blue"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/tvVehicleStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="⚫ Для управления нужен app_process"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#666" />
+
+        <Button
+            android:id="@+id/btnTestConnection"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Тест связи"
+            android:textSize="11sp"
+            android:minHeight="36dp"
+            android:enabled="false"
+            style="?android:attr/buttonStyleSmall" />
+    </LinearLayout>
+
+    <!-- Кнопки управления окнами -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="12dp">
+
+        <Button
+            android:id="@+id/btnOpenWindow"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="🪟 Открыть окно"
+            android:textSize="12sp"
+            android:layout_marginEnd="4dp"
+            android:background="@color/button_blue"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/btnCloseWindow"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="🔲 Закрыть окно"
+            android:textSize="12sp"
+            android:layout_marginStart="4dp"
+            android:background="@color/button_blue"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="12dp">
+
+        <Button
+            android:id="@+id/btnOpenAllWindows"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="🌬️ Открыть все"
+            android:textSize="12sp"
+            android:layout_marginEnd="4dp"
+            android:background="@color/button_blue"
+            android:textColor="@color/white"
+            android:enabled="false" />
+
+        <Button
+            android:id="@+id/btnCloseAllWindows"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="🔒 Закрыть все"
+            android:textSize="12sp"
+            android:layout_marginStart="4dp"
+            android:background="@color/button_blue"
+            android:textColor="@color/white"
+            android:enabled="false" />
+    </LinearLayout>
+
+    <!-- Дополнительные функции -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/btnDiscoverFunctions"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="🔍 Поиск функций"
+            android:textSize="11sp"
+            android:layout_marginEnd="4dp"
+            android:background="@color/button_blue"
+            android:textColor="@color/white"
+            android:enabled="false" />
+
+        <Button
+            android:id="@+id/btnSendCustomCommand"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="⚙️ Своя команда"
+            android:textSize="11sp"
+            android:layout_marginStart="4dp"
+            android:background="@color/button_blue"
+            android:textColor="@color/white"
+            android:enabled="false" />
+    </LinearLayout>
+
+    <!-- Разделитель -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#ddd"
+        android:layout_margin="8dp" />
+
     <!-- Заголовок для Bluetooth команд -->
     <TextView
         android:layout_width="match_parent"
@@ -202,11 +347,12 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="💡 Подсказка:\n\n1. Подключитесь к ADB\n2. Запустите app_process для доступа к системным сервисам\n3. Используйте команды управления автомобилем\n\nДля настройки ADB:\n• Включите отладку по Wi-Fi в настройках разработчика\n• Выполните: adb tcpip 5555"
-        android:textSize="12sp"
+        android:text="💡 Инструкция по использованию:\n\n1️⃣ Подключитесь к ADB\n2️⃣ Запустите app_process для получения системных прав\n3️⃣ Нажмите 'Тест связи' для проверки подключения к автомобилю\n4️⃣ Используйте кнопки управления окнами\n5️⃣ 'Поиск функций' найдет доступные команды\n\n🔧 Настройка ADB:\n• Включите отладку по Wi-Fi в настройках разработчика\n• Выполните: adb tcpip 5555\n\n🚗 Управление автомобилем работает только с активным app_process!"
+        android:textSize="11sp"
         android:textColor="#666"
         android:background="#fff"
         android:padding="16dp"
         android:layout_marginTop="8dp" />
 
 </LinearLayout>
+</ScrollView>

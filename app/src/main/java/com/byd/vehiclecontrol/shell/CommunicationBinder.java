@@ -18,6 +18,9 @@ public class CommunicationBinder extends Binder {
 
     private final CommunicationProcess process;
     private static boolean binderReceived = false;
+    
+    // Глобальный экземпляр для доступа из того же процесса
+    private static CommunicationBinder globalInstance;
 
     public CommunicationBinder(CommunicationProcess process) {
         this.process = process;
@@ -25,6 +28,15 @@ public class CommunicationBinder extends Binder {
 
     public static boolean isBinderReceived() {
         return binderReceived;
+    }
+    
+    public static void setGlobalInstance(CommunicationBinder instance) {
+        globalInstance = instance;
+        Log.d(TAG, "Global instance set: " + (instance != null));
+    }
+    
+    public static CommunicationBinder getGlobalInstance() {
+        return globalInstance;
     }
 
     @Override
@@ -40,12 +52,15 @@ public class CommunicationBinder extends Binder {
                 return true;
 
             case TRANSACTION_SET_INT:
+                data.enforceInterface(DESCRIPTOR);
                 return handleSetInt(data, reply);
 
             case TRANSACTION_START_VEHICLE:
+                data.enforceInterface(DESCRIPTOR);
                 return handleStartVehicle(data, reply);
 
             case TRANSACTION_NOTIFY_RECEIVED:
+                data.enforceInterface(DESCRIPTOR);
                 return handleNotifyReceived(data, reply);
 
             default:
@@ -55,8 +70,6 @@ public class CommunicationBinder extends Binder {
 
     private boolean handleSetInt(Parcel data, Parcel reply) {
         try {
-            // enforceInterface уже вызван в onTransact, не нужно повторно
-
             // Читаем параметры
             int deviceType = data.readInt();
             int eventType = data.readInt();
@@ -103,8 +116,6 @@ public class CommunicationBinder extends Binder {
 
     private boolean handleStartVehicle(Parcel data, Parcel reply) {
         try {
-            data.enforceInterface(DESCRIPTOR);
-
             int deviceType = data.readInt();
             long time = data.readLong();
             int reason = data.readInt();
@@ -147,7 +158,6 @@ public class CommunicationBinder extends Binder {
 
     private boolean handleNotifyReceived(Parcel data, Parcel reply) {
         try {
-            data.enforceInterface(DESCRIPTOR);
             binderReceived = true;
             Log.d(TAG, "Binder received notification");
 

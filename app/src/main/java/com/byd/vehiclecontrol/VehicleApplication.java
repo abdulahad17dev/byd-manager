@@ -14,6 +14,8 @@ public class VehicleApplication extends Application {
     private static final String TAG = "VehicleApplication";
     public static VehicleApplication INSTANCE;
 
+    // Статическое поле для глобального доступа к Binder (как в Evtech)
+    public static IBinder sCommunicationBinder;
     private IBinder communicationBinder;
 
     private final BroadcastReceiver binderReceiver = new BroadcastReceiver() {
@@ -24,7 +26,9 @@ public class VehicleApplication extends Application {
                 if (extras != null) {
                     communicationBinder = extras.getBinder("COMMUNICATION_BINDER");
                     if (communicationBinder != null) {
-                        Log.d(TAG, "Received communication binder");
+                        // Устанавливаем статическое поле для глобального доступа
+                        sCommunicationBinder = communicationBinder;
+                        Log.d(TAG, "Received communication binder, set static field");
 
                         // Уведомляем процесс что binder получен
                         CommunicationBinder.Companion.notifyReceived(communicationBinder);
@@ -50,5 +54,16 @@ public class VehicleApplication extends Application {
 
     public IBinder getCommunicationBinder() {
         return communicationBinder;
+    }
+    
+    // Статический метод для получения Binder (как в Evtech)
+    public static IBinder getStaticCommunicationBinder() {
+        return sCommunicationBinder;
+    }
+    
+    // Метод для установки Binder из shell процесса
+    public static void setCommunicationBinder(IBinder binder) {
+        sCommunicationBinder = binder;
+        Log.d("VehicleApplication", "Static communication binder set");
     }
 }
